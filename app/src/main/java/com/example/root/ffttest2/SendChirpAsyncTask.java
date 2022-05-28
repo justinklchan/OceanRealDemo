@@ -305,7 +305,9 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
                 data_signal = Utils.waitForChirp(Constants.SignalType.DataRx, m_attempt, 0);
 //                Utils.isSoundingSignal(MainActivity.av,sig);
             }
-            Decoder.decode_helper(av, data_signal, valid_bins);
+            if (data_signal!=null) {
+                Decoder.decode_helper(av, data_signal, valid_bins);
+            }
             return 0;
         }
         return 0;

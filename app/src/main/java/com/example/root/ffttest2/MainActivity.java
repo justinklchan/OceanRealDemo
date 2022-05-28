@@ -1,5 +1,7 @@
 package com.example.root.ffttest2;
 
+import static com.example.root.ffttest2.Constants.tts;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -13,6 +15,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.Voice;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
@@ -41,6 +45,7 @@ import androidx.core.widget.NestedScrollView;
 import com.jjoe64.graphview.GraphView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     String[] perms = new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
@@ -88,6 +93,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 //        Tests.bin_filling();
 //        Decoder.test_decode(this);
 //        Tests.freq_expand();
+        tts = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
+
+            @Override
+            public void onInit(int status) {
+                if(status == TextToSpeech.SUCCESS){
+                    int result=tts.setLanguage(Locale.UK);
+                    if(result==TextToSpeech.LANG_MISSING_DATA ||
+                        result==TextToSpeech.LANG_NOT_SUPPORTED){
+                        Log.e("error", "This Language is not supported");
+                    }
+                }
+                else
+                    Log.e("error", "Initilization Failed!");
+            }
+        });
+
         Constants.user  = Constants.User.Bob;
         startMethod(this);
     }

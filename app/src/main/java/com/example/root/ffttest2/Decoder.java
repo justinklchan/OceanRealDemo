@@ -7,13 +7,17 @@ import static com.example.root.ffttest2.Constants.xcorr_method;
 
 import android.app.Activity;
 import android.content.Context;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import org.w3c.dom.Text;
+
 import java.util.Arrays;
+import java.util.Locale;
 
 public class Decoder {
 
@@ -182,6 +186,9 @@ public class Decoder {
         Utils.log(coded +"=>"+uncoded+"=>"+message);
 
         String finalMessage = message;
+
+        Constants.tts.speak(message,TextToSpeech.QUEUE_FLUSH,null);
+
         av.runOnUiThread(new Runnable() {
             @Override
             public void run() {

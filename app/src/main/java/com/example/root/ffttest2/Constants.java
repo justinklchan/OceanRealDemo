@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -122,6 +123,7 @@ public class Constants {
     static int AdaptationMethod = 2;
     static double WaitForDataTime = 0;
 
+    static TextToSpeech tts = null;
     static boolean DIFFERENTIAL=true;
     static float FreAdaptScaleFactor;
 

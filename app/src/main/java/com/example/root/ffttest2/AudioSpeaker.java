@@ -46,6 +46,9 @@ public class AudioSpeaker extends Thread {
         for (Integer i : streams) {
             man.setStreamMute(i, true);
         }
+        man.setStreamMute(AudioManager.STREAM_MUSIC,false);
+        man.setStreamVolume(AudioManager.STREAM_MUSIC,(int)(man.getStreamMaxVolume(speakerType)),0);
+
         man.setStreamMute(speakerType, false);
         man.setStreamVolume(speakerType,(int)(man.getStreamMaxVolume(speakerType)),0);
 
