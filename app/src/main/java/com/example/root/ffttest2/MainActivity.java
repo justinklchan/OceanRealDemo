@@ -1,7 +1,5 @@
 package com.example.root.ffttest2;
 
-import static com.example.root.ffttest2.Constants.tts;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -94,12 +92,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 //        Decoder.test_decode(this);
 //        Tests.freq_expand();
 //        Tests.shuffle();
-        tts = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
+        Constants.tts = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
 
             @Override
             public void onInit(int status) {
                 if(status == TextToSpeech.SUCCESS){
-                    int result=tts.setLanguage(Locale.UK);
+                    int result=Constants.tts.setLanguage(Locale.UK);
                     if(result==TextToSpeech.LANG_MISSING_DATA ||
                         result==TextToSpeech.LANG_NOT_SUPPORTED){
                         Log.e("error", "This Language is not supported");
@@ -110,8 +108,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
-        Constants.user  = Constants.User.Bob;
-        startMethod(this);
+        if (Constants.sw12.isChecked()) {
+            Constants.user  = Constants.User.Bob;
+            startMethod(this);
+        }
     }
 
     public static void testme() {
@@ -182,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Constants.sw9 = (Switch) findViewById(R.id.switch9);
         Constants.sw10 = (Switch) findViewById(R.id.switch10);
         Constants.sw11 = (Switch) findViewById(R.id.switch11);
+        Constants.sw12 = (Switch) findViewById(R.id.switch12);
         Constants.spinner = (Spinner) findViewById(R.id.spinner);
         Constants.spinner2 = (Spinner) findViewById(R.id.spinner2);
         Constants.spinner3 = (Spinner) findViewById(R.id.spinner3);
@@ -485,6 +486,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 editor.putBoolean("check_sym", isChecked);
                 Constants.CHECK_SYM  = isChecked;
                 editor.commit();
+            }
+        });
+
+        Constants.sw12.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!isChecked) {
+                    stopMethod();
+                }
+                else {
+                    Constants.user  = Constants.User.Bob;
+                    startMethod(av);
+                }
             }
         });
 

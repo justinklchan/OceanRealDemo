@@ -148,7 +148,7 @@ public class Constants {
     public static EditText et1,et2,et3,et4,et5,et6,et7,et8,et9,et10,et11,et12,et13,et14,et15,et17,et18,et25,et26,et27;
     public static SendChirpAsyncTask task;
     public static User user;
-    public static Switch sw1,sw2,sw3,sw4,sw5,sw6,sw7,sw8,sw9,sw10,sw11;
+    public static Switch sw1,sw2,sw3,sw4,sw5,sw6,sw7,sw8,sw9,sw10,sw11,sw12;
     public static EqMethod eqMethod = EqMethod.Freq;
     public static String LOG="log";
     public static int Ns=960;
