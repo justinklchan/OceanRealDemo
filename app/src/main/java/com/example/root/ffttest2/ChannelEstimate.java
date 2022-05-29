@@ -279,8 +279,16 @@ public class ChannelEstimate {
         }
         Log.e("timer2",(System.currentTimeMillis()-t1)+"");
         Log.e(LOG, "selected "+Arrays.toString(selected));
-        selected=new int[]{0,5};
+//        selected=new int[]{0,1};
         if (selected.length==2&&selected[0] != -1 && selected[1] != -1) {
+            if (selected[1]-selected[0]==1) {
+                if (selected[0] > 0) {
+                    selected[0] -= 1;
+                }
+                else {
+                    selected[1] += 1;
+                }
+            }
             freqs = new int[selected.length];
             for (int i = 0; i < selected.length; i++) {
                 freqs[i] = fseq[selected[i]];
