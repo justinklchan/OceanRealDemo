@@ -218,7 +218,10 @@ public class FeedbackSignal {
         fend=Math.round(fend/10)*10;
 //        fbegin=1000;
 //        fend=1500;
+        fbegin=1000;
+        fend=1050;
         int freqs[] = new int[]{fbegin,fend};
+        Utils.log("feedback freqs "+fbegin+","+fend);
 
         int fbackLen=(int)((Constants.fbackTime/1000.0)*Constants.fs);
         int freqSpacing = Constants.fs/fbackLen;
