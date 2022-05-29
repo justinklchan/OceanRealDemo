@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 //        Tests.bin_filling();
 //        Decoder.test_decode(this);
 //        Tests.freq_expand();
+//        Tests.shuffle();
         tts = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
 
             @Override

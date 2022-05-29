@@ -309,6 +309,14 @@ public class Tests {
         Arrays.toString(filt);
     }
 
+    public static void shuffle() {
+        short[] bits = new short[]{0,1,2,3,4,5,6,7,8,9};
+        SymbolGeneration.shuffleArray(bits,1);
+
+        short[] out = SymbolGeneration.unshuffle(bits,1);
+        Log.e("asdf","");
+    }
+
     public static void test_mic() {
         Activity av;
         Constants.ts = System.currentTimeMillis();

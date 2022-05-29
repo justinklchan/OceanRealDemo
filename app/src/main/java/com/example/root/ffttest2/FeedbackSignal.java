@@ -216,10 +216,7 @@ public class FeedbackSignal {
 
         fbegin=Math.round(fbegin/10)*10;
         fend=Math.round(fend/10)*10;
-//        fbegin=1000;
-//        fend=1500;
-        fbegin=1000;
-        fend=1050;
+
         int freqs[] = new int[]{fbegin,fend};
         Utils.log("feedback freqs "+fbegin+","+fend);
 

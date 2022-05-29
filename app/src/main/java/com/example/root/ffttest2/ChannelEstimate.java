@@ -279,7 +279,7 @@ public class ChannelEstimate {
         }
         Log.e("timer2",(System.currentTimeMillis()-t1)+"");
         Log.e(LOG, "selected "+Arrays.toString(selected));
-
+        selected=new int[]{0,5};
         if (selected.length==2&&selected[0] != -1 && selected[1] != -1) {
             freqs = new int[selected.length];
             for (int i = 0; i < selected.length; i++) {

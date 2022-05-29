@@ -123,7 +123,7 @@ public class Decoder {
         double[][] weights = Utils.dividenative(tx_spec, rx_spec);
 
         double[][] rx_spec2 = Utils.timesnative(rx_spec, weights);
-//        short[] training_bits = Modulation.pskdemod(rx_spec2, Utils.arange(valid_bins[0], valid_bins[1]));
+        short[] training_bits = Modulation.pskdemod(rx_spec2, Utils.arange(valid_bins[0], valid_bins[1]));
 
         String coded = "";
         if (Constants.DIFFERENTIAL) {
@@ -146,9 +146,13 @@ public class Decoder {
             Log.e("meta", "number of symbols " + bits.length);
             // for each symbol
             for (int i = 0; i < bits.length; i++) {
+                short[] newbits = bits[i];
+                if (Constants.INTERLEAVE) {
+                    newbits = SymbolGeneration.unshuffle(bits[i], i);
+                }
                 // extract the data bits
                 for (int j = 0; j < meta[i + 1]; j++) {
-                    coded += bits[i][j] + "";
+                    coded += newbits[j] + "";
                 }
             }
         }
@@ -163,15 +167,19 @@ public class Decoder {
                 sym_spec = Utils.timesnative(sym_spec, weights);
 
                 short[] bits = Modulation.pskdemod(sym_spec, Utils.arange(valid_bins[0], valid_bins[1]));
+                short[] newbits = bits;
+                if (Constants.INTERLEAVE) {
+                    newbits = SymbolGeneration.unshuffle(bits, i);
+                }
                 for (int j = 0; j < meta[i + 1]; j++) {
-                    coded += bits[j] + "";
+                    coded += newbits[j] + "";
                 }
             }
         }
 
         String uncoded = "";
         if (Constants.CODING) {
-            uncoded = Utils.decode(coded);
+            uncoded = Utils.decode(coded, Constants.cc[0],Constants.cc[1],Constants.cc[2]);
         }
         else {
             uncoded = coded;

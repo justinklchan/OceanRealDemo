@@ -297,12 +297,12 @@ std::string jstring2string(JNIEnv *env, jstring jStr) {
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_example_root_ffttest2_Utils_encode(JNIEnv *env, jclass clazz, jstring bits) {
+Java_com_example_root_ffttest2_Utils_encode(JNIEnv *env, jclass clazz, jstring bits, jint poly1, jint poly2, jint constraint) {
     std::vector<int> polynomials;
-    polynomials.push_back(7);
-    polynomials.push_back(5);
+    polynomials.push_back(poly1);
+    polynomials.push_back(poly2);
 
-    ViterbiCodec codec(3, polynomials);
+    ViterbiCodec codec(constraint, polynomials);
     std::string decoded = codec.Encode(jstring2string(env,bits));
 
     return env->NewStringUTF(decoded.c_str());
@@ -310,12 +310,12 @@ Java_com_example_root_ffttest2_Utils_encode(JNIEnv *env, jclass clazz, jstring b
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_example_root_ffttest2_Utils_decode(JNIEnv *env, jclass clazz, jstring bits) {
+Java_com_example_root_ffttest2_Utils_decode(JNIEnv *env, jclass clazz, jstring bits, jint poly1, jint poly2, jint constraint) {
     std::vector<int> polynomials;
-    polynomials.push_back(7);
-    polynomials.push_back(5);
+    polynomials.push_back(poly1);
+    polynomials.push_back(poly2);
 
-    ViterbiCodec codec(3, polynomials);
+    ViterbiCodec codec(constraint, polynomials);
     std::string decoded = codec.Decode(jstring2string(env,bits));
 
     return env->NewStringUTF(decoded.c_str());

@@ -7,6 +7,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 public class SymbolGeneration {
     public static short[] generate(short[] bits, int[] valid_carrier,
@@ -74,14 +75,14 @@ public class SymbolGeneration {
         }
         int maxcodedbits = Constants.maxbits;
         if (Constants.CODING) {
-            maxcodedbits = Utils.encode(temp).length();
+            maxcodedbits = Utils.encode(temp, Constants.cc[0],Constants.cc[1],Constants.cc[2]).length();
         }
 
         short[] bits = new short[maxcodedbits];
 
         int bit_counter = 0;
         if (valid_carrier.length > 0) {
-            numrounds = (int) Math.ceil((double) pn20_bits.length/valid_carrier.length);
+            numrounds = (int) Math.ceil((double)maxcodedbits/valid_carrier.length);
         }
         int[] out = new int[numrounds+1];
         out[0]=numrounds;
@@ -193,6 +194,10 @@ public class SymbolGeneration {
             short[] tx_bits = Utils.concat_short(bits_seg,pad_bits);
             bitsWithPadding += Utils.trim(Arrays.toString(tx_bits))+", ";
 
+            if (Constants.INTERLEAVE) {
+                shuffleArray(tx_bits, i);
+            }
+
             if (Constants.DIFFERENTIAL) {
                 tx_bits = transform_bits(bit_list[i], tx_bits);
                 for (int j = 0; j < tx_bits.length; j++) {
@@ -246,6 +251,31 @@ public class SymbolGeneration {
                     Utils.genName(Constants.SignalType.Bit_Fill_1000_1500, m_attempt) + ".txt");
         }
         return txsig;
+    }
+
+    static void shuffleArray(short[] ar, int seed) {
+        Random rnd = new Random(seed);
+        for (int i = ar.length - 1; i > 0; i--) {
+            int index = rnd.nextInt(i + 1);
+            short a = ar[index];
+            ar[index] = ar[i];
+            ar[i] = a;
+        }
+    }
+
+    static short[] unshuffle(short[] ar, int seed) {
+        short[] tempArray = new short[ar.length];
+        for (int i = 0; i < tempArray.length; i++) {
+            tempArray[i] = (short)i;
+        }
+        shuffleArray(tempArray,seed);
+
+        short[] out = new short[ar.length];
+        for (int i = 0; i < ar.length; i++) {
+            int index = tempArray[i];
+            out[index] = ar[i];
+        }
+        return out;
     }
 
     public static short[] getTrainingSymbol(int[] valid_carrier) {
@@ -415,7 +445,7 @@ public class SymbolGeneration {
         String uncoded = Utils.pad2(Integer.toBinaryString(Constants.messageID));
         String coded = "";
         if (Constants.CODING) {
-            coded = Utils.encode(uncoded);
+            coded = Utils.encode(uncoded, Constants.cc[0],Constants.cc[1],Constants.cc[2]);
         }
         else {
             coded = uncoded;
