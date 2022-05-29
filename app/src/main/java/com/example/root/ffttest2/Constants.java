@@ -471,6 +471,8 @@ public class Constants {
     static int messageID=-1;
     static HashMap<Integer,String>mmap=new HashMap<>();
     static int[] cc = new int[]{7,5,10};
+    static boolean SPEECH_IN=false;
+    static boolean SPEECH_OUT=false;
 
     public static void toggleUI(boolean val) {
         Constants.sw1.setEnabled(val);

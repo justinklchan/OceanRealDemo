@@ -944,6 +944,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ImageView iv25=(ImageView)findViewById(R.id.imageView25);
         Constants.vv = (View)findViewById(R.id.myview);
 
+        if (!Constants.SPEECH_IN) {
+            iv25.setVisibility(View.GONE);
+        }
+
         iv1.setOnClickListener(new View.OnClickListener() {public void onClick(View view) { Constants.messageID=1;startWrapper(); }});
         iv2.setOnClickListener(new View.OnClickListener() {public void onClick(View view) { Constants.messageID=2;startWrapper(); }});
         iv3.setOnClickListener(new View.OnClickListener() {public void onClick(View view) { Constants.messageID=3;startWrapper(); }});

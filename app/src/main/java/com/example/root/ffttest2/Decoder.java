@@ -1,6 +1,7 @@
 package com.example.root.ffttest2;
 
 import static com.example.root.ffttest2.Constants.LOG;
+import static com.example.root.ffttest2.Constants.SPEECH_OUT;
 import static com.example.root.ffttest2.Constants.debugPane;
 import static com.example.root.ffttest2.Constants.valid_carrier_preamble;
 import static com.example.root.ffttest2.Constants.xcorr_method;
@@ -195,7 +196,9 @@ public class Decoder {
 
         String finalMessage = message;
 
-        Constants.tts.speak(message,TextToSpeech.QUEUE_FLUSH,null);
+        if (SPEECH_OUT) {
+            Constants.tts.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+        }
 
         av.runOnUiThread(new Runnable() {
             @Override
