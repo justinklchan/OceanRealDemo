@@ -1013,7 +1013,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         minval=i;
                     }
                 }
-                Log.e("stringidst",mindist+","+minval);
+                Utils.log("voicematch "+mindist+","+minval+","+Constants.mmap.get(minval));
                 Constants.messageID=minval;
                 startWrapper();
             }

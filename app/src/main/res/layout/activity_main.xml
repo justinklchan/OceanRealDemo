@@ -192,7 +192,7 @@
             android:id="@+id/sym4"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:text="Are you ok?"
+            android:text="Are you okay?"
             android:gravity="center" />
 
         <ImageView
@@ -227,7 +227,7 @@
             android:id="@+id/sym5"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:text="Ok"
+            android:text="Okay"
             android:gravity="center" />
         <TextView
             android:id="@+id/sym6"

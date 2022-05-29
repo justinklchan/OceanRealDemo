@@ -471,8 +471,8 @@ public class Constants {
     static int messageID=-1;
     static HashMap<Integer,String>mmap=new HashMap<>();
     static int[] cc = new int[]{7,5,10};
-    static boolean SPEECH_IN=false;
-    static boolean SPEECH_OUT=false;
+    static boolean SPEECH_IN=true;
+    static boolean SPEECH_OUT=true;
 
     public static void toggleUI(boolean val) {
         Constants.sw1.setEnabled(val);
@@ -523,8 +523,8 @@ public class Constants {
         mmap.put(1,"Ascend");
         mmap.put(2,"Descend");
         mmap.put(3,"Something's wrong");
-        mmap.put(4,"Are you ok?");
-        mmap.put(5,"Ok");
+        mmap.put(4,"Are you okay?");
+        mmap.put(5,"Okay");
         mmap.put(6,"Stop!");
         mmap.put(7,"Turn around");
         mmap.put(8,"Which way?");
