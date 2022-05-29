@@ -3,6 +3,7 @@ package com.example.root.ffttest2;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -13,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
 import android.text.Editable;
@@ -30,9 +32,12 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.ViewCompat;
@@ -44,6 +49,7 @@ import com.jjoe64.graphview.GraphView;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     String[] perms = new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
@@ -935,7 +941,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ImageView iv22=(ImageView)findViewById(R.id.imageView22);
         ImageView iv23=(ImageView)findViewById(R.id.imageView23);
         ImageView iv24=(ImageView)findViewById(R.id.imageView24);
+        ImageView iv25=(ImageView)findViewById(R.id.imageView25);
         Constants.vv = (View)findViewById(R.id.myview);
+
         iv1.setOnClickListener(new View.OnClickListener() {public void onClick(View view) { Constants.messageID=1;startWrapper(); }});
         iv2.setOnClickListener(new View.OnClickListener() {public void onClick(View view) { Constants.messageID=2;startWrapper(); }});
         iv3.setOnClickListener(new View.OnClickListener() {public void onClick(View view) { Constants.messageID=3;startWrapper(); }});
@@ -960,6 +968,52 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         iv22.setOnClickListener(new View.OnClickListener() {public void onClick(View view) { Constants.messageID=22;startWrapper(); }});
         iv23.setOnClickListener(new View.OnClickListener() {public void onClick(View view) { Constants.messageID=23;startWrapper(); }});
         iv24.setOnClickListener(new View.OnClickListener() {public void onClick(View view) { Constants.messageID=24;startWrapper(); }});
+
+        iv25.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent
+                        = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
+                        Locale.getDefault());
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text");
+
+                try {
+                    startActivityForResult(intent, 1);
+                }
+                catch (Exception e) {
+                    Toast.makeText(MainActivity.this, " " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK && data != null) {
+                ArrayList<String> result = data.getStringArrayListExtra(
+                        RecognizerIntent.EXTRA_RESULTS);
+                String textresult = Objects.requireNonNull(result).get(0);
+                int mindist = Integer.MAX_VALUE;
+                int minval = 1;
+                for (int i = 1; i<=24; i++) {
+                    int dist = Utils.LevenshteinDistance(textresult,Constants.mmap.get(i));
+                    if (dist<mindist) {
+                        mindist=dist;
+                        minval=i;
+                    }
+                }
+                Log.e("stringidst",mindist+","+minval);
+                Constants.messageID=minval;
+                startWrapper();
+            }
+        }
     }
 
     protected void onPause() {
