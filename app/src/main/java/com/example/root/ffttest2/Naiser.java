@@ -30,7 +30,7 @@ public class Naiser {
         }
         double[] max_info = Utils.max(naiser_corr);
         max_info[1] = max_info[1] *DIVIDE_FACTOR;
-        Log.e("multiple times",Integer.toString(multi_num));
+//        Log.e("multiple times",Integer.toString(multi_num));
         return  max_info;
     }
 
@@ -41,7 +41,7 @@ public class Naiser {
         if(peak_index - win_size < 0 || peak_index + win_size + 7860 > signal.length) return -2;
         double[] preamble_seg = Utils.segment(signal, peak_index - win_size, peak_index + win_size + 7860 -1);
         double[] max_info = Naiser_corr(preamble_seg, 960, step_size);
-        Log.e("naiser","max info "+max_info[0]+","+naiser_threshold);
+//        Log.e("naiser","max info "+max_info[0]+","+naiser_threshold);
         if(max_info[0] < naiser_threshold) return -1;
         else{
             return (int)(peak_index - win_size + max_info[1]);

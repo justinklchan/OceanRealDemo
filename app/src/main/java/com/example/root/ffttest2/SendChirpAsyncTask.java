@@ -268,10 +268,10 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
             int[] valid_bins = null;
             double[] sounding_signal = null;
             do {
-                Log.e("fifo","work bob");
-                Log.e("timer","wait for chirp "+m_attempt+","+chirpLoopNumber);
+//                Log.e("fifo","work bob");
+//                Log.e("timer","wait for chirp "+m_attempt+","+chirpLoopNumber);
                 sounding_signal = Utils.waitForChirp(Constants.SignalType.Sounding, m_attempt, chirpLoopNumber);
-                Log.e("timer","finish wait for chirp "+(sounding_signal==null));
+//                Log.e("timer","finish wait for chirp "+(sounding_signal==null));
                 if (sounding_signal == null) {
                     return -1;
                 }

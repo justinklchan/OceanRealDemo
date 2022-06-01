@@ -321,7 +321,7 @@ public class Tests {
         Activity av;
         Constants.ts = System.currentTimeMillis();
         String name = Utils.genName(Constants.SignalType.Feedback,1);
-        Log.e("Beging thread1",name);
+//        Log.e("Beging thread1",name);
         Constants.stereo=false;
         Constants._OfflineRecorder = new OfflineRecorder(MainActivity.av, Constants.fs,  name);
         Constants._OfflineRecorder.start2();
@@ -330,17 +330,17 @@ public class Tests {
         int count = 0;
         for (int i = 0; i < N; i++) {
             short[] samples = Constants._OfflineRecorder.get_FIFO();
-            Log.e("fifo","got samples "+i);
+//            Log.e("fifo","got samples "+i);
 
             for(int t = 0; t < samples.length; ++t){
                 save_samples[count] = samples[t];
                 count++;
             }
-            Log.e("thread1","read sucessfully......");
+//            Log.e("thread1","read sucessfully......");
         }
 
 //        FileOperations.writetofile(MainActivity.av, save_samples, "recv.txt");
-        Log.e("thread1","begin halting......" + String.valueOf(count));
+//        Log.e("thread1","begin halting......" + String.valueOf(count));
         Constants._OfflineRecorder.halt2();
     }
 

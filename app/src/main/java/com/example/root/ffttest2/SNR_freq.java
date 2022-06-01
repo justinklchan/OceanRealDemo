@@ -2,7 +2,8 @@ package com.example.root.ffttest2;
 
 public class SNR_freq {
     public static double[] calculate_snr(double[][][] rx_spectrum, double[][] gt_symbol) {
-        int symbol_num = gt_symbol[0].length;
+//        int symbol_num = gt_symbol[0].length;
+        int symbol_num = 7;
         int bin_num = gt_symbol.length;
         double[] SNR_list = new double[bin_num];
 
@@ -11,14 +12,14 @@ public class SNR_freq {
             H[0] = 0;
             H[1] = 0;
             for(int j = 0; j < symbol_num; ++j) {
-                H[0] += rx_spectrum[0][i][j]*gt_symbol[i][j];
-                H[1] += rx_spectrum[1][i][j]*gt_symbol[i][j];
+                H[0] += rx_spectrum[0][i][j]*gt_symbol[i][0];
+                H[1] += rx_spectrum[1][i][j]*gt_symbol[i][0];
             }
             H[0] = H[0]/symbol_num;
             H[1] = H[1]/symbol_num;
             double noise_level = 0;
             for(int j = 0; j < symbol_num; ++j) {
-                noise_level += Math.pow(rx_spectrum[0][i][j]*gt_symbol[i][j] - H[0],2 )+ Math.pow(H[1] - rx_spectrum[1][i][j]*gt_symbol[i][j], 2);
+                noise_level += Math.pow(rx_spectrum[0][i][j]*gt_symbol[i][0] - H[0],2 )+ Math.pow(H[1] - rx_spectrum[1][i][j]*gt_symbol[i][0], 2);
             }
             noise_level = noise_level/symbol_num;
             double signal_level = Math.pow(H[0], 2) + Math.pow(H[1], 2);

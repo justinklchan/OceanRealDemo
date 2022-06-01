@@ -583,7 +583,7 @@ public class Utils {
         long t1 = System.currentTimeMillis();
 //        Log.e("fifo","filt length "+filt.length+"");
         double[] corr = xcorr_helper(preamble,filt);
-        Log.e("timer2","a "+(System.currentTimeMillis()-t1)+"");
+//        Log.e("timer2","a "+(System.currentTimeMillis()-t1)+"");
 
         if (Constants.XcorrVersion==1) {
             return evalSegv1(filt, corr, 0, preamble);
@@ -591,7 +591,7 @@ public class Utils {
         else if (Constants.XcorrVersion==2){
 //            t1 = System.currentTimeMillis();
             double[] out = evalSegv2(sig, filt, corr, preamble, sigType);
-            Log.e("timer2","b "+(System.currentTimeMillis()-t1)+"");
+//            Log.e("timer2","b "+(System.currentTimeMillis()-t1)+"");
             return out;
         }
         return new double[]{-1,-1};
@@ -669,11 +669,11 @@ public class Utils {
     public static double[] evalSegv2(double[] sig, double[] filt, double[] corr,double[] preamble,
                                      Constants.SignalType sigType) {
         int[] cands=Utils.getCandidateLocs(corr);
-        Log.e("cands","cands "+cands.length);
+//        Log.e("cands","cands "+cands.length);
         for (int j = 0; j < cands.length; j++) {
             int idx = (transform_idx(cands[j], filt.length));
             int legit2 = Naiser.Naiser_check_valid(filt, idx);
-            Log.e("cands_stat",cands[j]+","+idx+","+legit2+","+sigType);
+//            Log.e("cands_stat",cands[j]+","+idx+","+legit2+","+sigType);
             if (legit2 > 0) {
                 boolean legit = Utils.isLegit(sig,sigType,preamble,idx);
 //                if (legit || !Constants.CHECK_SYM) {
@@ -804,7 +804,7 @@ public class Utils {
             }
             else if (Constants.exp_num==5) {
                 if (Constants.Ns==960||Constants.Ns==1920) {
-                    timeout = 2;
+                    timeout = 3;
                 }
                 else if (Constants.Ns==4800) {
                     timeout=6;
@@ -840,7 +840,7 @@ public class Utils {
         long t1 = System.currentTimeMillis();
         for (long i = 0; i < N; i++) {
             Double[] rec = Utils.convert2(Constants._OfflineRecorder.get_FIFO());
-            Log.e("timer1",m_attempt+","+rec.length+","+i+","+N+","+(System.currentTimeMillis()-t1)+"");
+//            Log.e("timer1",m_attempt+","+rec.length+","+i+","+N+","+(System.currentTimeMillis()-t1)+"");
 
             if (sigType.equals(Constants.SignalType.Sounding)||
                 sigType.equals(Constants.SignalType.Feedback)||
@@ -1028,7 +1028,7 @@ public class Utils {
     }
 
     public static double[] xcorr_helper(double[] preamble, double[] sig) {
-        Log.e(LOG, "Utils_xcorr " + preamble.length + "," + sig.length);
+//        Log.e(LOG, "Utils_xcorr " + preamble.length + "," + sig.length);
         double[][] a = Utils.fftcomplexoutnative_double(preamble, sig.length);
         double[][] b = Utils.fftcomplexoutnative_double(sig, sig.length);
         Utils.conjnative(b);
