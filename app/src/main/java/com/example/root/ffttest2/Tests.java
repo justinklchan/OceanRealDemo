@@ -50,7 +50,7 @@ public class Tests {
             int[] cands = Utils.getCandidateLocs(corr);
             for (Integer i : cands) {
                 int idx = (Utils.transform_idx(i, seg.length));
-                int out = Naiser.Naiser_check_valid(filt, idx);
+//                int out = Naiser.Naiser_check_valid(filt, idx);
 //                Log.e("naiser", j+":"+out + "");
             }
             Log.e("asdf",(System.currentTimeMillis()-t1)+"");

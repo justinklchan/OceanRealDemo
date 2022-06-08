@@ -723,8 +723,8 @@ public class Constants {
 
     public static void updateNaiser(Context cxt) {
         if (NAISER) {
-            Constants.preambleTime = 160;
-            naiser = FileOperations.readrawasset(cxt, R.raw.naiser, 1);
+            Constants.preambleTime = 195;
+            naiser = FileOperations.readrawasset(cxt, R.raw.naiser3, 1);
 //            preamble_spec1 = FileOperations.readrawasset(cxt, R.raw.real_naiser,1);
 //            preamble_spec2 = FileOperations.readrawasset(cxt, R.raw.imag_naiser,1);
         }

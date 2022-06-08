@@ -20,7 +20,7 @@ public class SymbolGeneration {
         Log.e("sym",bits.length+","+valid_carrier.length+","+numrounds);
 
 //        int symlen = (Constants.Ns+Constants.Cp)*symreps + Constants.Gi;
-        int symlen = (Constants.Ns)*symreps + Constants.Gi;
+        int symlen = (Constants.Ns+Constants.Cp)*symreps + Constants.Gi;
 
         int siglen = symlen*numrounds;
         if (preamble) {
@@ -316,7 +316,7 @@ public class SymbolGeneration {
         return newbits;
     }
 
-    public static short[] mod(int bound1, int bound2, int[] valid_carrier, short[] bits, int subnum) {
+    public static short[] mod(int bound1, int bound2, int[] valid_carrier, short[] bits, int subnum, Constants.SignalType sigType) {
         double[][] mod = Modulation.pskmod(bits);
         if (bits.length < subnum) {
             bound2 = bound1+bits.length-1;
@@ -334,9 +334,12 @@ public class SymbolGeneration {
         double[][] symbol_complex = Utils.ifftnative2(sig);
 
         short[] symbol = new short[symbol_complex[0].length];
-        int divval=(bound2-bound1)+1;
+        double divval=(bound2-bound1)+1;
+        if (sigType.equals(Constants.SignalType.Sounding)) {
+            divval = divval/2;
+        }
         for (int i = 0; i < symbol.length; i++) {
-            symbol[i] = (short)((symbol_complex[0][i]/(double)divval)*32767);
+            symbol[i] = (short)((symbol_complex[0][i]/(double)divval)*32767.0);
         }
 
         return symbol;
@@ -361,58 +364,47 @@ public class SymbolGeneration {
             subnum = bound2-bound1+1;
         }
 
-        short[] symbol = mod(bound1, bound2, valid_carrier, bits, subnum);
+        short[] symbol = mod(bound1, bound2, valid_carrier, bits, subnum, sigType);
         short[] flipped_symbol=null;
-        if(Constants.FLIP_SYMBOL) {flipped_symbol = mod(bound1, bound2, valid_carrier, Utils.flip(bits), subnum);}
+        if(Constants.FLIP_SYMBOL) {flipped_symbol = mod(bound1, bound2, valid_carrier, Utils.flip(bits), subnum, sigType);}
 
         int datacounter = 0;
         short[] out = null;
-        if (sigType.equals(Constants.SignalType.Sounding)) {
-            int long_cp = 0;
-            out = new short[symbol.length*symreps + long_cp + Constants.Gi];
-//            short[] cp = new short[long_cp];
-//            for (int i = 0; i < long_cp; i++) {
-//                cp[i] = symbol[(symbol.length - long_cp - 1) + i];
-//            }
-//
-//            int counter=0;
-//            for (int i = 0; i < long_cp; i++) {
-//                out[counter++] = cp[i];
-//            }
-        }
-        else if (sigType.equals(Constants.SignalType.DataAdapt)||
+
+        if (sigType.equals(Constants.SignalType.DataAdapt)||
                 sigType.equals(Constants.SignalType.DataFull_1000_4000)||
                 sigType.equals(Constants.SignalType.DataFull_1000_2500)||
                 sigType.equals(Constants.SignalType.DataFull_1000_1500)) {
-            int long_cp = Constants.Cp;
-            out = new short[symbol.length*symreps + long_cp + Constants.Gi];
+            int long_cp = Constants.Cp * symreps;
             short[] cp = new short[long_cp];
             for (int i = 0; i < long_cp; i++) {
                 cp[i] = symbol[(symbol.length - long_cp - 1) + i];
             }
 
-            for (int i = 0; i < long_cp; i++) {
-                out[datacounter++] = cp[i];
-            }
-        }
+            out = new short[symbol.length*symreps + long_cp + Constants.Gi];
 
-        if (sigType.equals(Constants.SignalType.Sounding) && Constants.FLIP_SYMBOL) {
-            int scounter = 0;
+            for (int j = 0; j < cp.length; j++) {
+                out[datacounter++] = cp[j];
+            }
             for (int i = 0; i < symreps; i++) {
-                if (i == 1 || i == 2 || i == 3 || i == 4 || i==5) {
-                    for (int j = 0; j < symbol.length; j++) {
-                        out[scounter++] = symbol[j];
-                    }
-                }
-                else {
-                    for (int j = 0; j < symbol.length; j++) {
-                        out[scounter++] = flipped_symbol[j];
-                    }
+                for (int j = 0; j < symbol.length; j++) {
+                    out[datacounter++] = symbol[j];
                 }
             }
         }
-        else {
+        else if (sigType.equals(Constants.SignalType.Sounding)) {
+            int long_cp = Constants.Cp;
+            short[] cp = new short[long_cp];
+            for (int i = 0; i < long_cp; i++) {
+                cp[i] = symbol[(symbol.length - long_cp - 1) + i];
+            }
+
+            out = new short[(symbol.length+long_cp)*symreps + Constants.Gi];
+
             for (int i = 0; i < symreps; i++) {
+                for (int j = 0; j < cp.length; j++) {
+                    out[datacounter++] = cp[j];
+                }
                 for (int j = 0; j < symbol.length; j++) {
                     out[datacounter++] = symbol[j];
                 }

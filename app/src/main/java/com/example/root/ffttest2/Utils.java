@@ -35,6 +35,14 @@ public class Utils {
         System.loadLibrary("native-lib");
     }
 
+    public static double[] copyArray2(Double[] sig) {
+        double[] out = new double[sig.length];
+        for (int i = 0; i < sig.length; i++) {
+            out[i]=sig[i];
+        }
+        return out;
+    }
+
     public static String pad2(String str) {
         int padlen=Constants.maxbits-str.length();
         String out = "";
@@ -579,7 +587,7 @@ public class Utils {
         return maxidx;
     }
 
-    public static double[] xcorr_online(double[] preamble, double[] filt, double[] sig, int sig_len, Constants.SignalType sigType) {
+    public static double[] xcorr_online(double[] preamble, double[] filt, double[] sig, Constants.SignalType sigType) {
         long t1 = System.currentTimeMillis();
 //        Log.e("fifo","filt length "+filt.length+"");
         double[] corr = xcorr_helper(preamble,filt);
@@ -594,7 +602,7 @@ public class Utils {
 //            Log.e("timer2","b "+(System.currentTimeMillis()-t1)+"");
             return out;
         }
-        return new double[]{-1,-1};
+        return new double[]{-1,-1,-1};
     }
 
     public static double[] calculateSNR_null(double[] spec_symbol) {
@@ -670,19 +678,24 @@ public class Utils {
                                      Constants.SignalType sigType) {
         int[] cands=Utils.getCandidateLocs(corr);
 //        Log.e("cands","cands "+cands.length);
+        double max=0;
+        int maxidx=0;
         for (int j = 0; j < cands.length; j++) {
             int idx = (transform_idx(cands[j], filt.length));
-            int legit2 = Naiser.Naiser_check_valid(filt, idx);
+            double[] legit2 = Naiser.Naiser_check_valid(filt, idx);
+            if (legit2[1]>max) {
+                max=legit2[1];
+                maxidx = idx;
+            }
 //            Log.e("cands_stat",cands[j]+","+idx+","+legit2+","+sigType);
-            if (legit2 > 0) {
+            if (legit2[0] > 0) {
                 boolean legit = Utils.isLegit(sig,sigType,preamble,idx);
 //                if (legit || !Constants.CHECK_SYM) {
-//                if (legit) {
-                return new double[]{corr[cands[j]], idx};
+                return new double[]{corr[cands[j]], idx, legit2[1]};
 //                }
             }
         }
-        return new double[]{-1,-1};
+        return new double[]{-1,maxidx,max};
     }
 
     public static double[] evalSegv1(double[] filt, double[] corr, int counter, double[] preamble) {
@@ -762,6 +775,13 @@ public class Utils {
     }
 
     public static double[] waitForChirp(Constants.SignalType sigType, int m_attempt, int chirpLoopNumber) {
+        String filename = Utils.genName(sigType, m_attempt, chirpLoopNumber);
+        Log.e("fifo",filename);
+
+        Constants._OfflineRecorder = new OfflineRecorder(
+                MainActivity.av, Constants.fs, filename);
+        Constants._OfflineRecorder.start2();
+
         int MAX_WINDOWS = 0;
 
         int numWindowsLeft = 0;
@@ -770,32 +790,32 @@ public class Utils {
         int ChirpSamples = (int)((Constants.preambleTime/1000.0)*Constants.fs);
         if (sigType.equals(Constants.SignalType.Sounding)) {
             if (Constants.Ns==960||Constants.Ns==1920) {
-                MAX_WINDOWS = 1;
+                MAX_WINDOWS = 2;
             }
             else if (Constants.Ns==4800) {
                 MAX_WINDOWS=2;
             }
             else if (Constants.Ns==9600) {
-                MAX_WINDOWS=4;
+                MAX_WINDOWS=3;
             }
-            timeout = Long.MAX_VALUE;
+            timeout = 30;
             len = ChirpSamples+Constants.ChirpGap+(Constants.Ns*Constants.chanest_symreps);
         }
         else if (sigType.equals(Constants.SignalType.Feedback)) {
             MAX_WINDOWS = 2;
             if (Constants.Ns==960||Constants.Ns==1920) {
-                timeout = 3;
+                timeout = 5;
             }
             else if (Constants.Ns==4800) {
-                timeout=3;
+                timeout=7;
             }
             else if (Constants.Ns==9600) {
-                timeout=5;
+                timeout=7;
             }
             len = ChirpSamples+Constants.Ns+ChirpSamples;
         }
         else if (sigType.equals(Constants.SignalType.DataRx)) {
-            MAX_WINDOWS = 1;
+            MAX_WINDOWS = 2;
             if (Constants.exp_num==1 || Constants.exp_num == 2) {
                 timeout = 11;
             }
@@ -818,34 +838,24 @@ public class Utils {
         int N = (int)(timeout*(Constants.fs/Constants.RecorderStepSize));
         double[] tx_preamble = ChirpGen.preamble_d();
 
-        String filename = Utils.genName(sigType, m_attempt, chirpLoopNumber);
-        Log.e("fifo",filename);
-
-//        if (Constants._OfflineRecorder != null) {
-//            Constants._OfflineRecorder.halt2();
-//        }
-
-        Constants._OfflineRecorder = new OfflineRecorder(
-                MainActivity.av, Constants.fs, filename);
-        Constants._OfflineRecorder.start2();
-
         ArrayList<Double[]> sampleHistory = new ArrayList<>();
         ArrayList<Double> valueHistory = new ArrayList<>();
         ArrayList<Double> idxHistory = new ArrayList<>();
         int synclag = 200;
         double[] sounding_signal = new double[]{};
+        sounding_signal=new double[(MAX_WINDOWS*Constants.RecorderStepSize)];
+        Log.e("len","sig length "+sounding_signal.length+","+sigType.toString());
         boolean valid_signal = false;
 //        boolean getOneMoreFlag = false;
         int sounding_signal_counter=0;
-        long t1 = System.currentTimeMillis();
-        for (long i = 0; i < N; i++) {
+        for (int i = 0; i < N; i++) {
             Double[] rec = Utils.convert2(Constants._OfflineRecorder.get_FIFO());
 //            Log.e("timer1",m_attempt+","+rec.length+","+i+","+N+","+(System.currentTimeMillis()-t1)+"");
 
             if (sigType.equals(Constants.SignalType.Sounding)||
-                sigType.equals(Constants.SignalType.Feedback)||
-                sigType.equals(Constants.SignalType.DataRx)) {
-                Log.e("fifo","loop "+i);
+                    sigType.equals(Constants.SignalType.Feedback)||
+                    sigType.equals(Constants.SignalType.DataRx)) {
+//                Log.e("fifo","loop "+i);
 
                 if (i<MAX_WINDOWS) {
                     sampleHistory.add(rec);
@@ -860,61 +870,56 @@ public class Utils {
                         filt = Utils.filter(filt);
 
                         //value,idx
-//                    t1=System.currentTimeMillis();
-                        double[] xcorr_out = Utils.xcorr_online(tx_preamble, filt, out, rec.length, sigType);
-//                    Log.e("timer2",(System.currentTimeMillis()-t1)+"");
+                        double[] xcorr_out = Utils.xcorr_online(tx_preamble, filt, out, sigType);
 
-                        if (xcorr_out[0]>0) {
-                            Utils.log("xcorr out " + i + "," + xcorr_out[0] + "," + xcorr_out[1]);
-                        }
+                        long t1 = System.currentTimeMillis();
+                        Utils.log(String.format("xcorr out %.0f,%.0f (%.2f)",xcorr_out[0],xcorr_out[1],xcorr_out[2]));
+//                        Constants.time = t1;
+
                         sampleHistory.add(rec);
                         valueHistory.add(xcorr_out[0]);
                         idxHistory.add(xcorr_out[1]);
 
                         if (xcorr_out[0] != -1) {
                             if (xcorr_out[1] + len + synclag > Constants.RecorderStepSize*MAX_WINDOWS) {
-                                Log.e("fifo","one more flag "+xcorr_out[1]+","+(xcorr_out[1] + len + synclag));
-                                numWindowsLeft = MAX_WINDOWS;
-                                sounding_signal = new double[(numWindowsLeft*Constants.RecorderStepSize)+(out.length-(int)xcorr_out[1]+1)];
-//                                copy out from xcorr_out[1] to end into sounding signal
-                                for (int j = (int)xcorr_out[1]; j < out.length; j++) {
-                                    sounding_signal[sounding_signal_counter++]=out[j];
+                                Log.e("copy","one more flag "+xcorr_out[1]+","+(xcorr_out[1] + len + synclag));
+
+                                numWindowsLeft = MAX_WINDOWS-1;
+
+//                                Log.e("copy","copying "+out[t_idx]+","+out[t_idx+1]+","+out[t_idx+2]+","+out[t_idx+3]+","+out[t_idx+4]);
+                                for (int j = (int)xcorr_out[1]; j < filt.length; j++) {
+                                    sounding_signal[sounding_signal_counter++]=filt[j];
                                 }
+
+                                Log.e("copy", "copy ("+xcorr_out[1]+","+filt.length+") to ("+sounding_signal_counter+")");
                             } else {
-                                Log.e("fifo","good! "+out.length+","+xcorr_out[1]+","+out.length);
-                                sounding_signal = Utils.segment(out, (int) xcorr_out[1], out.length - 1);
+                                Log.e("copy","good! "+filt.length+","+xcorr_out[1]+","+filt.length);
+//                                Utils.log("good");
+                                int counter=0;
+                                for (int k = (int) xcorr_out[1]; k < filt.length; k++) {
+                                    sounding_signal[counter++] = filt[k];
+                                }
+//                                sounding_signal = Utils.segment(filt, (int) xcorr_out[1], filt.length - 1);
                                 valid_signal = true;
                                 break;
                             }
                         }
                     }
-                    else {
-                        Log.e("fifo","another window from "+sounding_signal_counter+","+(sounding_signal_counter+rec.length)+","+sounding_signal.length);
-                        for (int j = 0; j < rec.length; j++) {
-                            sounding_signal[sounding_signal_counter++]=rec[j];
+                    else if (sounding_signal_counter>0){
+//                        Utils.log("another window");
+                        Log.e("copy","another window from "+sounding_signal_counter+","+(sounding_signal_counter+rec.length)+","+sounding_signal.length);
+
+                        double[] filt2 = Utils.copyArray2(rec);
+                        filt2 = Utils.filter(filt2);
+
+                        for (int j = 0; j < filt2.length; j++) {
+                            sounding_signal[sounding_signal_counter++]=filt2[j];
                         }
                         numWindowsLeft -= 1;
                         if (numWindowsLeft==0){
                             valid_signal=true;
                             break;
                         }
-//                        if(xcorr_out[0] > valueHistory.get(valueHistory.size()-1)) {
-//                            Log.e("fifo","segment 2 "+out.length+","+xcorr_out[1]+","+out.length);
-//                            sounding_signal = Utils.segment(out,(int)xcorr_out[1],out.length-1);
-//                            valid_signal = true;
-//                            break;
-//                        } else if (xcorr_out[0] != -1){
-//                            valid_signal = true;
-//                            Log.e("fifo","segment 3 "+out.length+","+xcorr_out[1]+","+out.length);
-//                            sounding_signal = Utils.segment(out, (int)xcorr_out[1], out.length-1);
-////                            numWindowsLeft--;
-//                            break;
-//                        } else if (xcorr_out[1] == -1) {
-//                            // can occur with noise
-//                            Log.e("fifo","noise..." +xcorr_out[0]+","+xcorr_out[1]);
-//                            numWindowsLeft = 0;
-//                        }
-
                     }
 
                     if(sampleHistory.size() >= 6){
@@ -924,37 +929,10 @@ public class Utils {
                     }
                 }
             }
-//            else {
-//                sampleHistory.add(rec);
-//            }
         }
 
         Constants._OfflineRecorder.halt2();
 
-//        if (sigType.equals(Constants.SignalType.DataRx)) {
-//            double[] out = new double[sampleHistory.get(0).length * sampleHistory.size()];
-//            double maxcorrval=0;
-//            int maxidx=0;
-//            for (Double[] rec : sampleHistory) {
-//                double[] filt = Utils.copyArray(out);
-//                Utils.filter(filt);
-//
-//                double[] xcorr_out = Utils.xcorr_online(tx_preamble, filt, out, rec.length);
-//                if (xcorr_out[1]-Constants.besselFiltOffset >= 0) {
-//                    xcorr_out[1] -= Constants.besselFiltOffset;
-//                }
-//                if (xcorr_out[0] > maxcorrval) {
-//                    maxcorrval=xcorr_out[0];
-//                    maxidx = (int)xcorr_out[1];
-//                }
-//            }
-//            return out;
-//        }
-
-        Log.e("decode",sounding_signal.length+","+sigType.toString());
-//        if (sigType.equals(Constants.SignalType.DataRx)) {
-//            return Utils.concat4(sampleHistory.get(0),sampleHistory.get(1),sampleHistory.get(2),sampleHistory.get(3));
-//        }
         if (valid_signal) {
             return sounding_signal;
         }

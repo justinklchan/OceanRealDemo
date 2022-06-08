@@ -232,9 +232,8 @@ public class FeedbackSignal {
         }
 
         short[] feedback = new short[fbackLen];
-        int counter2=0;
-        for (int i = counter; i < len; i++) {
-            feedback[counter2++] = txsig[i];
+        for (int i = 0; i < feedback.length; i++) {
+            feedback[i] = txsig[counter++];
         }
 
         double[] spec_fback = Utils.fftnative_short(feedback, feedback.length);
