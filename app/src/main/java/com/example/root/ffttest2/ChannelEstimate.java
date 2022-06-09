@@ -275,7 +275,7 @@ public class ChannelEstimate {
         //                    snrs = SNR_freq.calculate_snr(spec_est, Constants.pn40_syms, 0, 5);
                 }
                 else if (Constants.subcarrier_number_default == 60) {
-                    snrs = SNR_freq.calculate_snr(spec_est, Constants.pn60_syms, 1, Constants.chanest_symreps-1);
+                    snrs = SNR_freq.calculate_snr(spec_est, Constants.pn60_syms, 1, Constants.chanest_symreps);
         //                    snrs = SNR_freq.calculate_snr(spec_est, Constants.pn60_syms, 0,5);
                 }
                 else if (Constants.subcarrier_number_default == 120) {
