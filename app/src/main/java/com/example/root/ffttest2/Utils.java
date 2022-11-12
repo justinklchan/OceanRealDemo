@@ -58,7 +58,7 @@ public class Utils {
         (MainActivity.av).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Constants.debugPane.setText(Constants.debugPane.getText()+"\n"+s);
+                Constants.debugPane.setText(s);
                 scrollToBottom();
             }
         });
@@ -874,7 +874,8 @@ public class Utils {
                         double[] xcorr_out = Utils.xcorr_online(tx_preamble, filt, out, sigType);
 
                         long t1 = System.currentTimeMillis();
-                        Utils.log(String.format("xcorr out %.0f,%.0f (%.2f)",xcorr_out[0],xcorr_out[1],xcorr_out[2]));
+//                        Utils.log(String.format("Listening... %.0f,%.0f (%.2f)",xcorr_out[0],xcorr_out[1],xcorr_out[2]));
+                        Utils.log(String.format("Listening... (%.2f)",xcorr_out[2]));
 //                        Constants.time = t1;
 
                         sampleHistory.add(rec);
@@ -1236,7 +1237,7 @@ public class Utils {
                     new NotificationCompat.Builder(mContext.getApplicationContext(), "channel");
             Intent ii = new Intent(mContext.getApplicationContext(), MainActivity.class);
             ii.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, ii, 0);
+            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, ii, PendingIntent.FLAG_IMMUTABLE);
 
             NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
             bigText.bigText(message);

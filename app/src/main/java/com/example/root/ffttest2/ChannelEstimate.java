@@ -147,6 +147,8 @@ public class ChannelEstimate {
         Log.e(LOG, "xcorr " + start_point + ":" + (System.currentTimeMillis() - t1) + ":" + rec.length);
 
         int rx_preamble_start = start_point;
+        rx_preamble_start+=240;
+
         int rx_preamble_end = rx_preamble_start + (int) (((Constants.preambleTime / 1000.0) * Constants.fs)) - 1;
 //        int rx_preamble_len = (rx_preamble_end - rx_preamble_start) + 1;
 //        Utils.log("preamble "+rec.length+","+rx_preamble_start+","+rx_preamble_end+","+rx_preamble_len);

@@ -70,8 +70,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-        sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_FASTEST);
+//        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+//        sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_FASTEST);
 
         KeyboardVisibilityEvent.setEventListener(
                 this,
@@ -1049,7 +1049,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
-    public void startWrapper() {
+    public static void startWrapper() {
         Constants.user  = Constants.User.Alice;
         stopMethod();
         startMethod(av);
@@ -1080,7 +1080,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         startMethod(av);
     }
 
-    public void stopMethod() {
+    public static void stopMethod() {
         if (Constants.task != null) {
             Constants.task.cancel(true);
         }
@@ -1088,7 +1088,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Constants.timer.cancel();
         }
 
-        sensorManager.unregisterListener(this);
+//        sensorManager.unregisterListener(this);
         Constants.work=false;
         Log.e("asdf","onstop");
         Constants.sensorFlag=false;
